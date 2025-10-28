@@ -1,30 +1,46 @@
-# Compiler
+# C compiler
 CC = gcc
 
-# Compiler flags
-CFLAGS = -Wall -g -Iinclude
-
-# Linker flags
-LDFLAGS = 
-
-# Our target exec name
 TARGET = bedrock
 
-SOURCES = $(wildcard src/*.c)
+SRC_DIR = src
+INC_DIR = include
+OBJ_DIR = obj
+BIN_DIR = bin
 
-OBJECTS = $(SOURCES:.c=.o)
+# --- Flags ---
+CFLAGS = -Wall -g -I$(INC_DIR)
 
-all: $(TARGET)
+LDFLAGS = 
 
-$(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LDFLAGS)
+# --- Build Rules ---
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
 
+OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SOURCES))
 
-%.o: %.c
+EXECUTABLE = $(BIN_DIR)/$(TARGET)
+
+# --- Targets ---
+.PHONY: all
+all: $(EXECUTABLE)
+
+# Rules to build the final executable
+$(EXECUTABLE): $(OBJECTS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	@echo "build complete: $(EXECUTABLE)"
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+.PHONY: clean
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	@rm -rf $(OBJ_DIR) $(BIN_DIR)
+	@echo "cleaned build artifacts."
 
 
+.PHONY: run
+run: all
+	@$(EXECUTABLE) $(ARGS)
 
