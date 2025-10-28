@@ -1,0 +1,11 @@
+# Compiled C files
+*.o
+*.out
+
+# Executable
+bedrock
+bedrock.exe
+
+# Build directories (optional)
+/build
+/bin
